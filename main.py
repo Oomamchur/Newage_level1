@@ -6,6 +6,7 @@ import aiohttp
 import gspread
 import pandas as pd
 from PIL import Image
+from tqdm import tqdm
 
 URL = "https://docs.google.com/spreadsheets/d/1QX2IhFyYmGDFMvovw2WFz3wAT4piAZ_8hi5Lzp7LjV0/edit#gid=1902149593"
 
@@ -52,7 +53,7 @@ async def main():
 
     chunked_data = list(split_data_into_chunks(data))
 
-    for chunk in chunked_data:
+    for chunk in tqdm(chunked_data, desc="Processing data chunks"):
         await update_worksheet(worksheet, chunk)
 
     print("Check your email")
