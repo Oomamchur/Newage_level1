@@ -1,12 +1,16 @@
 import asyncio
 import io
+import os
 import time
 
 import aiohttp
 import gspread
 import pandas as pd
 from PIL import Image
+from dotenv import load_dotenv
 from tqdm import tqdm
+
+load_dotenv()
 
 URL = "https://docs.google.com/spreadsheets/d/1QX2IhFyYmGDFMvovw2WFz3wAT4piAZ_8hi5Lzp7LjV0/edit#gid=1902149593"
 
@@ -48,7 +52,7 @@ async def main():
     data = sh.sheet1.get_all_records()
 
     new_sh = gc.create("new_age_level1")
-    new_sh.share("oomamchur@gmail.com", perm_type="user", role="writer")
+    new_sh.share(os.environ.get("EMAIL"), perm_type="user", role="writer")
     worksheet = new_sh.sheet1
 
     chunked_data = list(split_data_into_chunks(data))
