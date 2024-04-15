@@ -2,17 +2,18 @@ import asyncio
 import io
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 import aiohttp
 import gspread
 import pandas as pd
 from PIL import Image
 from dotenv import load_dotenv
-from tqdm import tqdm
 
 load_dotenv()
 
-URL = "https://docs.google.com/spreadsheets/d/1QX2IhFyYmGDFMvovw2WFz3wAT4piAZ_8hi5Lzp7LjV0/edit#gid=1902149593"
+URL = ("https://docs.google.com/spreadsheets/d/"
+       "1QX2IhFyYmGDFMvovw2WFz3wAT4piAZ_8hi5Lzp7LjV0/edit#gid=1902149593")
 
 
 async def parse_single_size(session: aiohttp.ClientSession, url: str) -> dict:
@@ -57,8 +58,10 @@ async def main():
 
     chunked_data = list(split_data_into_chunks(data))
 
-    for chunk in tqdm(chunked_data, desc="Processing data chunks"):
-        await update_worksheet(worksheet, chunk)
+    with ThreadPoolExecutor() as executor:
+        await asyncio.gather(
+            *[update_worksheet(worksheet, chunk) for chunk in chunked_data]
+        )
 
     print("Check your email")
 
